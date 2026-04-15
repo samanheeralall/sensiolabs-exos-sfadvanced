@@ -6,6 +6,7 @@ use App\Entity\Conference;
 use App\Repository\ConferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -14,30 +15,22 @@ use Symfony\Component\Routing\Requirement\Requirement;
 class ConferenceController extends AbstractController
 {
     #[Route('', name: 'app_conference_list', methods: ['GET'])]
-    public function list(ConferenceRepository $repository): Response
+    public function list(Request $request, ConferenceRepository $repository): Response
     {
-        $conferences = $repository->findAll();
-        $conferences = array_map(
-            fn($c) => [
-                'id' => $c->getId(),
-                'name' => $c->getName(),
-                'description' => $c->getDescription(),
-            ],
-            $conferences
-        );
+        $page = $request->query->getInt('page', 1);
+        $limit = 10;
+        $conferences = $repository->findBy([], limit: $limit, offset: ($page - 1) * $limit);
 
-        return $this->json($conferences);
+        return $this->render('conference/list.html.twig', [
+            'conferences' => $conferences,
+        ]);
     }
 
     #[Route('/{id<\d+>}', name: 'app_conference_show', methods: ['GET'])]
     public function show(Conference $conference): Response
     {
-        return $this->json([
-            'id' => $conference->getId(),
-            'name' => $conference->getName(),
-            'description' => $conference->getDescription(),
-            'startAt' => $conference->getStartAt(),
-            'endAt' => $conference->getEndAt(),
+        return $this->render('conference/show.html.twig', [
+            'conference' => $conference,
         ]);
     }
 

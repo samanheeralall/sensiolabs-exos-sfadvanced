@@ -10,10 +10,39 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
+#[Route('/conference')]
 class ConferenceController extends AbstractController
 {
+    #[Route('', name: 'app_conference_list', methods: ['GET'])]
+    public function list(ConferenceRepository $repository): Response
+    {
+        $conferences = $repository->findAll();
+        $conferences = array_map(
+            fn($c) => [
+                'id' => $c->getId(),
+                'name' => $c->getName(),
+                'description' => $c->getDescription(),
+            ],
+            $conferences
+        );
+
+        return $this->json($conferences);
+    }
+
+    #[Route('/{id<\d+>}', name: 'app_conference_show', methods: ['GET'])]
+    public function show(Conference $conference): Response
+    {
+        return $this->json([
+            'id' => $conference->getId(),
+            'name' => $conference->getName(),
+            'description' => $conference->getDescription(),
+            'startAt' => $conference->getStartAt(),
+            'endAt' => $conference->getEndAt(),
+        ]);
+    }
+
     #[Route(
-        '/conference/{name}/{start}/{end}',
+        '/{name}/{start}/{end}',
         name: 'app_conference_new',
         requirements: [
             'name' => Requirement::CATCH_ALL,

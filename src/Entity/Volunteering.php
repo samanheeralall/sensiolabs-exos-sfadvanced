@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\VolunteeringRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: VolunteeringRepository::class)]
 class Volunteering
@@ -13,15 +14,24 @@ class Volunteering
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank()]
+    #[Assert\GreaterThanOrEqual(propertyPath: 'conference.startAt')]
     #[ORM\Column]
     private ?\DateTimeImmutable $startAt = null;
 
+    #[Assert\NotBlank()]
+    #[Assert\GreaterThanOrEqual(propertyPath: 'startAt')]
+    #[Assert\LessThanOrEqual(propertyPath: 'conference.endAt')]
     #[ORM\Column]
     private ?\DateTimeImmutable $endAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'volunteerings')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Conference $conference = null;
+
+    #[ORM\ManyToOne(inversedBy: 'volunteerings')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $forUser = null;
 
     public function getId(): ?int
     {
@@ -60,6 +70,18 @@ class Volunteering
     public function setConference(?Conference $conference): static
     {
         $this->conference = $conference;
+
+        return $this;
+    }
+
+    public function getForUser(): ?User
+    {
+        return $this->forUser;
+    }
+
+    public function setForUser(?User $forUser): static
+    {
+        $this->forUser = $forUser;
 
         return $this;
     }

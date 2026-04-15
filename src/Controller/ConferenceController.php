@@ -15,7 +15,7 @@ class ConferenceController extends AbstractController
         '/conference/{name}/{start}/{end}',
         name: 'app_conference_new',
         requirements: [
-            'name' => '[a-zA-Z0-9-_ ]{3,}',
+            'name' => Requirement::CATCH_ALL,
             'start' => Requirement::DATE_YMD,
             'end' => Requirement::DATE_YMD,
         ]

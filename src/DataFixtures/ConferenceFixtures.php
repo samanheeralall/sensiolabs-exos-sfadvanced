@@ -54,8 +54,8 @@ class ConferenceFixtures extends Fixture implements DependentFixtureInterface
             ->setName($row['name'])
             ->setDescription($row['description'])
             ->setAccessible($row['accessible'])
-            ->setStartAt(new \DateTimeImmutable($row['startAt']))
-            ->setEndAt(new \DateTimeImmutable($row['endAt']))
+            ->setStartAt((new \DateTimeImmutable($row['startAt']))->setTime(0, 0, 0))
+            ->setEndAt((new \DateTimeImmutable($row['endAt']))->setTime(23, 59, 59))
         ;
 
         if ($organization instanceof Organization) {

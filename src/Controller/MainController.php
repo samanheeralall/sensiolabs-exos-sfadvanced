@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Dto\Contact;
+use App\Form\ContactType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,9 +21,22 @@ class MainController extends AbstractController
         ]);
     }
 
-    #[Route('/contact', name: 'app_main_contact', methods: ['GET'])]
-    public function contact(): Response
+    #[Route('/contact', name: 'app_main_contact', methods: ['GET', 'POST'])]
+    public function contact(Request $request): Response
     {
-        return $this->render('main/contact.html.twig');
+        $contact = new Contact();
+        $form = $this->createForm(ContactType::class, $contact);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $contact->setSentAt(new \DateTimeImmutable());
+            dump($contact);
+
+            return $this->redirectToRoute('app_main_index');
+        }
+
+        return $this->render('main/contact.html.twig', [
+            'form' => $form,
+        ]);
     }
 }

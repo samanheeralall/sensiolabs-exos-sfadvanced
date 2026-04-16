@@ -9,8 +9,9 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-//#[When('prod')]
-#[AsDecorator(ConferenceSearchInterface::class)]
+#[When('prod')]
+#[When('dev')]
+#[AsDecorator(ConferenceSearchInterface::class, priority: 10)]
 readonly class CacheableConferenceSearch implements ConferenceSearchInterface
 {
     public function __construct(

@@ -4,8 +4,10 @@ namespace App\Search\Database;
 
 use App\Repository\ConferenceRepository;
 use App\Search\ConferenceSearchInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
+#[AutoconfigureTag('app.conference_search')]
 readonly class DatabaseConferenceSearch implements ConferenceSearchInterface
 {
     public function __construct(

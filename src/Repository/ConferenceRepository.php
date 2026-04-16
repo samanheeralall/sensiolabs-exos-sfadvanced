@@ -16,6 +16,24 @@ class ConferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, Conference::class);
     }
 
+    public function findLikeName(string $name, ?int $limit = null, ?int $offset = null): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        if (\is_int($limit)) {
+            $qb->setMaxResults($limit);
+        }
+
+        if (\is_int($offset)) {
+            $qb->setFirstResult($offset);
+        }
+
+        return $qb->andWhere($qb->expr()->like('c.name', ':name'))
+            ->setParameter('name', '%' . $name . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findBetweenDates(?\DateTimeImmutable $start = null, ?\DateTimeImmutable $end = null): array
     {
         if (null === $start && null === $end) {

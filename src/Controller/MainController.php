@@ -12,13 +12,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class MainController extends AbstractController
 {
     #[Route('/', name: 'app_main_index', methods: ['GET'])]
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        $name = $request->query->get('name', 'World');
-
-        return $this->render('main/index.html.twig', [
-            'name' => $name,
-        ]);
+        return $this->render('main/index.html.twig');
     }
 
     #[Route('/contact', name: 'app_main_contact', methods: ['GET', 'POST'])]

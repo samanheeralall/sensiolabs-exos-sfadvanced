@@ -28,6 +28,17 @@ class ConferenceController extends AbstractController
         ]);
     }
 
+    #[Route('/conference/search', name: 'app_conference_search', methods: ['GET'])]
+    public function search(Request $request, ConferenceSearchInterface $search): Response
+    {
+        $page = $request->query->get('page');
+        $name = $request->query->get('name');
+
+        return $this->render('conference/search.html.twig', [
+            'conferences' => $search->searchByName($name, $page)
+        ]);
+    }
+
     #[Route('/{id<\d+>}', name: 'app_conference_show', methods: ['GET'])]
     public function show(Conference $conference): Response
     {

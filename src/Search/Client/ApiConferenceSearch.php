@@ -3,15 +3,13 @@
 namespace App\Search\Client;
 
 use App\Search\ConferenceSearchInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 readonly class ApiConferenceSearch implements ConferenceSearchInterface
 {
     public function __construct(
-        private HttpClientInterface $client,
-        #[Autowire(env: 'CONF_API_KEY')]
-        private string $apiKey
+        #[Target('conf.client')] private HttpClientInterface $client,
     ) {}
 
     public function searchByName(?string $name = null, ?int $page = null): array
@@ -26,12 +24,8 @@ readonly class ApiConferenceSearch implements ConferenceSearchInterface
             $query['page'] = $page;
         }
 
-        return $this->client->request('GET', 'https://www.devevents-api.fr/events', [
+        return $this->client->request('GET', '/events', [
             'query' => $query,
-            'headers' => [
-                'Accept' => 'application/json',
-                'apikey' => $this->apiKey,
-            ],
         ])->toArray();
     }
 }

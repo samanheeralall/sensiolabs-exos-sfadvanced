@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Conference;
 use App\Entity\Organization;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -45,6 +46,7 @@ class ConferenceFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             OrganizationFixtures::class,
+            UserFixtures::class,
         ];
     }
 
@@ -56,6 +58,7 @@ class ConferenceFixtures extends Fixture implements DependentFixtureInterface
             ->setAccessible($row['accessible'])
             ->setStartAt((new \DateTimeImmutable($row['startAt']))->setTime(0, 0, 0))
             ->setEndAt((new \DateTimeImmutable($row['endAt']))->setTime(23, 59, 59))
+            ->setCreatedBy($this->getReference('user_organizer', User::class))
         ;
 
         if ($organization instanceof Organization) {

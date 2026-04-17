@@ -23,6 +23,7 @@ class UserFixtures extends Fixture
         $password = $this->passwordHasherFactory->getPasswordHasher($user)->hash('admin');
         $user->setPassword($password);
         $manager->persist($user);
+        $this->setReference('user_admin', $user);
 
         $user = (new User())
             ->setEmail('organizer@sensio-events.com')
@@ -32,6 +33,7 @@ class UserFixtures extends Fixture
         $password = $this->passwordHasherFactory->getPasswordHasher($user)->hash('organizer');
         $user->setPassword($password);
         $manager->persist($user);
+        $this->setReference('user_organizer', $user);
 
         $user = (new User())
             ->setEmail('user@sensio-events.com')
@@ -41,6 +43,7 @@ class UserFixtures extends Fixture
         $password = $this->passwordHasherFactory->getPasswordHasher($user)->hash('user');
         $user->setPassword($password);
         $manager->persist($user);
+        $this->setReference('user_user', $user);
 
         $manager->flush();
     }

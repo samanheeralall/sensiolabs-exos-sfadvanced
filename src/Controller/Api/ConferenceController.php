@@ -20,6 +20,7 @@ final class ConferenceController extends AbstractController
 
         return $this->json($search->searchByName(page: $page), context: [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn($obj) => ['id' => $obj->getId()],
+            AbstractNormalizer::GROUPS => ['conference:list'],
         ]);
     }
 }

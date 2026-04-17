@@ -3,28 +3,24 @@
 namespace App\Controller\Api;
 
 use App\Repository\ConferenceRepository;
+use App\Search\ConferenceSearchInterface;
+use App\Search\Database\DatabaseConferenceSearch;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-class ConferenceController extends AbstractController
+final class ConferenceController extends AbstractController
 {
-    #[Route('/conferences', name: 'app_api_conferences', methods: ['GET'])]
-    public function getConferencesApi(Request $request, ConferenceRepository $repository): JsonResponse
+    #[Route('/api/conference', name: 'app_api_conference')]
+    public function index(Request $request, #[Autowire(service: DatabaseConferenceSearch::class)] ConferenceSearchInterface $search): JsonResponse
     {
-        $page = $request->query->getInt('page', 1);
-        $limit = 10;
+        $page = $request->query->get('page');
 
-        $conferences = $repository->findBy(
-            [],
-            limit: $limit,
-            offset: ($page - 1) * $limit
-        );
-
-        return $this->json($conferences, context: [
-            'circular_reference_handler' => fn (object $object) => $object->getId(),
-            'groups' => ['api'],
+        return $this->json($search->searchByName(page: $page), context: [
+            AbstractNormalizer::GROUPS => ['api'],
         ]);
     }
 }

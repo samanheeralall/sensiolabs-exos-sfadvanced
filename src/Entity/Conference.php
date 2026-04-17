@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ConferenceRepository::class)]
@@ -15,16 +16,19 @@ class Conference
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['api'])]
     private ?int $id = null;
 
     #[Assert\NotBlank()]
     #[Assert\Length(min: 10)]
     #[ORM\Column(length: 255)]
+    #[Groups(['api'])]
     private ?string $name = null;
 
     #[Assert\NotBlank()]
     #[Assert\Length(min: 30)]
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['api'])]
     private ?string $description = null;
 
     #[Assert\NotNull()]
@@ -54,6 +58,7 @@ class Conference
     /**
      * @var Collection<int, Organization>
      */
+    #[Groups(['api'])]
     #[ORM\ManyToMany(targetEntity: Organization::class, inversedBy: 'conferences')]
     private Collection $organizations;
 

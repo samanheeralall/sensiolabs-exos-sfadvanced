@@ -4,6 +4,7 @@ namespace App\Search\Client\Persistence;
 
 use App\Dto\ApiConference;
 use App\Entity\Conference;
+use App\Entity\User;
 use App\Repository\ConferenceRepository;
 use App\Repository\OrganizationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,6 +14,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 class ApiConferencePersister
 {
     private bool $isOrganizerOrWebsite;
+
+    private ?User $user;
 
     public function __construct(
         private readonly ConferenceRepository $conferenceRepository,
@@ -27,6 +30,16 @@ class ApiConferencePersister
         $this->isOrganizerOrWebsite =
             $security->isGranted('ROLE_ORGANIZER')
             || $security->isGranted('ROLE_WEBSITE');
+    }
+
+    #[Required]
+    public function setUser(Security $security): void
+    {
+        $user = $security->getUser();
+
+        if ($user instanceof User) {
+            $this->user = $user;
+        }
     }
 
     public function findOrPersist(ApiConference $dto): Conference
@@ -78,6 +91,10 @@ class ApiConferencePersister
     private function persistForAdmins(object $entity, bool $flush = false): void
     {
         if ($this->isOrganizerOrWebsite) {
+            if ($entity instanceof Conference) {
+                $entity->setCreatedBy($this->user);
+            }
+
             $this->manager->persist($entity);
 
             if ($flush) {

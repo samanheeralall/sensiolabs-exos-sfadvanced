@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Conference;
 use App\Form\ConferenceType;
+use App\Registry\ConferenceAttributes;
 use App\Search\ConferenceSearchInterface;
 use App\Search\Database\DatabaseConferenceSearch;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,13 +52,21 @@ class ConferenceController extends AbstractController
 
     #[IsGranted(new Expression("is_granted('ROLE_ORGANIZER') or is_granted('ROLE_WEBSITE')"))]
     #[Route('/new', name: 'app_conference_new', methods: ['GET', 'POST'])]
-    public function newConference(Request $request, EntityManagerInterface $manager): Response
+    #[Route('/{id<\d+>}/edit', name: 'app_conference_edit', methods: ['GET', 'POST'])]
+    public function newConference(?Conference $conference, Request $request, EntityManagerInterface $manager): Response
     {
-        $conference = new Conference();
+        if ($conference instanceof Conference) {
+            $this->denyAccessUnlessGranted(ConferenceAttributes::EDIT_CONF, $conference);
+        }
+
+        $conference ??= new Conference();
         $form = $this->createForm(ConferenceType::class, $conference);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (null === $conference->getId()) {
+                $conference->setCreatedBy($this->getUser());
+            }
             $manager->persist($conference);
             $manager->flush();
 
